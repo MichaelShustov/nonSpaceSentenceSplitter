@@ -4,4 +4,4 @@ the Matlab function to split sentence without spaces between words into the list
 For example, you have a string "helloiamrobotihaveatask"
 And we want to split it into separated words using the dictionary ["hello" "i" "am" "robot" "have" "task" "mask" "gun" "a"]
 
-as a result we want to get a separated string as a list of words ["hello" "i" "am" "a" "robot" "i" "have" "a" "task"]
+as a result we want to get a separated string as a list of words ["hello" "i" "am" "robot" "i" "have" "a" "task"]
