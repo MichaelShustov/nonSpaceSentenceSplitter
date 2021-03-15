@@ -1,4 +1,4 @@
-function resStr = nonSpaceSentenceSplit(Dict, SentenceStr)
+function resStr = nonSpaceSentenceSplit(Dict, SentenceStr, weighted)
 %nonSpaceSentenceSplit splits the non-space-sentence into separated words from a
 %dictionary Dict. (C) Michael Shustov, 2021.
 
@@ -6,6 +6,9 @@ function resStr = nonSpaceSentenceSplit(Dict, SentenceStr)
 %SentenceStr - string ("ilikebikei")
 %resStr - result string array of words of the sentence ["i" "like" "bike"
 %"i"]
+%weighted - 'true'/'false'. If 'true' - the smaller sized words are
+%preferable. Example: in a dictionary ["a" "aa" "aaa" "aaat"] and sentence
+%"aaaaaat" the function will find ["a" "a" "a" "aaat"]. 
 
 %%
 %The first step - find positions of words from the dictionary in our
@@ -54,7 +57,12 @@ for i = 1:size(Dict,2)
        for j = 1:size(DictPos{i},2)
           
           %this is our positions matrix
-          Matr(DictPos{i}(j):DictPos{i}(j)+curLength-1,k) = 1; 
+          if weighted == 'true' 
+              weight = curLength;
+          else weight = 1;
+          end
+          
+          Matr(DictPos{i}(j):DictPos{i}(j)+curLength-1,k) = 1/weight; 
           
           %this is the array who's 1st col contains the number of word in
           %the dictionary and the second col contains related start
@@ -92,6 +100,7 @@ sol1 = linsolve(Matr,vect1);
 %the language we may not filter them, because they do not influence much on
 %the solution result (they give 1-2 wrong words in the dictionary)
 sol1 = round(sol1);
+sol1(sol1>1) = 1;
 
 %%
 %sort the words in the dictionary of probable positions
