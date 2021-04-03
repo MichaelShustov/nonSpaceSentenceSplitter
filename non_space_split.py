@@ -1,5 +1,5 @@
 
-def non_space_split(dictlist, sentence, weighted = False):
+def non_space_split(dictlist, sentence, weighted = False, treshold = 0.5):
 
     import numpy
     from scipy.linalg import qr
@@ -10,6 +10,7 @@ def non_space_split(dictlist, sentence, weighted = False):
     :param dictlist: type - list, a list of possible words (dictionary)
     :param sentence: type - str, the sentence to be splitted
     :param weighted: type - bool, an optional parameter to use length-weight
+    :param treshold: type - float, an optional treshold for result normalization
     :return: type - list, a list of splitted words of the sentence
     '''
 
@@ -92,7 +93,6 @@ def non_space_split(dictlist, sentence, weighted = False):
 
         # transform list of lists to array of numpy. This is the left side matrix of the system
         matr = numpy.asarray(wordarr)
-        # wordarrpos = numpy.asarray(wordarrpos)
         return (matr,wordarrpos)
 
     def lin_solve_qr_underdet(a,b):
@@ -106,7 +106,7 @@ def non_space_split(dictlist, sentence, weighted = False):
 
         rows,cols = a.shape
 
-        if rows<cols:
+        if rows<cols:       # if the system is really undertetermined
             a_t = a.transpose()
             q,r,p = qr(a_t,pivoting = True, mode='economic')
 
@@ -118,10 +118,10 @@ def non_space_split(dictlist, sentence, weighted = False):
         else:
             return -1
 
-     # Now we need to solve the system of equations matr*sol=univect
+    # Now we need to solve the system of equations matr*sol=univect
     # right side vector
     univect1 = [1]*len(sentence)
-    univect = (numpy.asmatrix(univect1)).transpose()
+    univect = (numpy.asarray(univect1)).transpose()
 
     # left side matrix
     (matr,wordarrpos) = build_words_matr()
@@ -137,7 +137,6 @@ def non_space_split(dictlist, sentence, weighted = False):
 
     # normalize the solution with a treshold. All what is less than
     # treshold becomes equal to 0, all what is more than treshold becomes 1
-    treshold = 0.5
     normsol = list()
     for s in sol:
         if s>treshold:
